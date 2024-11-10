@@ -1,0 +1,17 @@
+{application, az_gateway, [
+    {description, "An OTP application"},
+    {vsn, "0.1.0"},
+    {registered, []},
+    {mod, {az_gateway_app, []}},
+    {applications, [
+        kernel,
+        stdlib,
+        ranch,
+        cowlib,
+        cowboy
+    ]},
+    {env, []},
+    {modules, []},
+    {licenses, ["Apache-2.0"]},
+    {links, []}
+ ]}.

@@ -1,0 +1,16 @@
+{application, amaze_client, [
+    {description, "An OTP application"},
+    {vsn, "0.1.0"},
+    {registered, []},
+    {mod, {amaze_client_app, []}},
+    {applications, [
+        kernel,
+        stdlib,
+        ibrowse,
+        gun
+    ]},
+    {env, []},
+    {modules, []},
+    {licenses, ["Apache-2.0"]},
+    {links, []}
+ ]}.
