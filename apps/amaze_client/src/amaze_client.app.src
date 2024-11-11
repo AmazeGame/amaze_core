@@ -1,11 +1,16 @@
 {application, amaze_client, [
-    {description, "An OTP application"},
+    {description, "Client Of AmazeGame"},
     {vsn, "0.1.0"},
     {registered, []},
     {mod, {amaze_client_app, []}},
     {applications, [
         kernel,
         stdlib,
+        crypto,
+        cowlib,
+        asn1,
+        public_key,
+        ssl,
         ibrowse,
         gun
     ]},

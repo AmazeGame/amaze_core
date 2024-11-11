@@ -11,3 +11,4 @@
 
 %% API
 -export([]).
+-callback init(Arg::term())->ok.
