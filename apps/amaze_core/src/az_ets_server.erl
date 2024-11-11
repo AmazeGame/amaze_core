@@ -61,6 +61,7 @@ delete_ets(Name)->
 	{ok, State :: #az_ets_server_state{}} | {ok, State :: #az_ets_server_state{}, timeout() | hibernate} |
 	{stop, Reason :: term()} | ignore).
 init([]) ->
+	process_flag(trap_exit, true),
 	OwnerTabId = ets:new(?ALL_TABLE,[named_table,set,protected,{keypos,#ets_infos.table_id},{read_concurrency,true}]),
 	{ok,EtsList} = application:get_env(az_ets_server),
 	{ok,EtsDir} = application:get_env(ets_dir),

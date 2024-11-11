@@ -10,29 +10,46 @@
 -include("az_global.hrl").
 -behaviour(az_gateway_transport).
 %% API
--export([init/1]).
--export([stop/1]).
-
--spec init([{atom(),term(),term()}])-> ok.
-init(Listeners)->
+-export([init_transport/1]).
+-export([stop_transport/1]).
+-export([init/2]). %% for cowboy handle
+-spec init_transport([{atom(),term(),term()}])-> ok.
+init_transport(ListenerInfos)->
 	Dispatch = cowboy_router:compile([
-		{'_', [{"/", http_transport, []}]}
+		{'_', [{"/", ?MODULE, []}]}
 	]),
-
 	lists:foreach(
-		fun({Listener,StartFunc,TransportOpts})->
-			{ok, _} = cowboy:StartFunc(Listener,
-				TransportOpts,
-				#{env => #{dispatch => Dispatch}}
-			) end,Listeners),
+		fun
+			({Listener,clear,TransportOpts,PackFrame})->
+				{ok, _} =
+					cowboy:start_clear(Listener,TransportOpts,
+						#{
+							env => #{dispatch => Dispatch,
+								pack_frame=> PackFrame
+							}}
+					);
+			({Listener,tls,TransportOpts,PackFrame})->
+				{ok, _} =
+					cowboy:start_tls(Listener,TransportOpts,
+						#{
+							env => #{dispatch => Dispatch,
+								pack_frame=> PackFrame
+							}}
+					)
+		end,ListenerInfos),
 	ok.
 
 
--spec stop([{atom(),term(),term()}])-> ok.
-stop(Listeners)->
+-spec stop_transport([{atom(),term(),term()}])-> ok.
+stop_transport(Listeners)->
 	lists:foreach(
 		fun({Listener,_,_})->
 			cowboy:stop_listener(Listener)
 			 end,Listeners),
 		ok.
 
+init(Req0, Opts) ->
+	Req = cowboy_req:reply(200, #{
+		<<"content-type">> => <<"text/plain">>
+	}, <<"Hello world!">>, Req0),
+	{ok, Req, Opts}.

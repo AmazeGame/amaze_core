@@ -12,6 +12,7 @@
 -export([check_behaviour/2]).
 
 -spec check_behaviour(module(),module())-> boolean().
-check_behaviour(Module,_Behaviour)->
-	Module:module_info(),
-	[].
+check_behaviour(Module,TargetBehaviour)->
+	MInfo = Module:module_info(attributes),
+	Behaviours = proplists:get_value(behaviour,MInfo),
+	lists:member(TargetBehaviour,Behaviours).
