@@ -1,0 +1,17 @@
+{application, amaze_gateway, [
+    {description, "Gateway for AmazeGame"},
+    {vsn, "0.1.0"},
+    {registered, []},
+    {mod, {amaze_gateway_app, []}},
+    {applications, [
+        kernel,
+        stdlib,
+        ranch,
+        cowlib,
+        cowboy
+    ]},
+    {env, []},
+    {modules, []},
+    {licenses, ["Apache-2.0"]},
+    {links, []}
+ ]}.

@@ -1,9 +1,9 @@
 %%%-------------------------------------------------------------------
-%% @doc amaze_core top level supervisor.
+%% @doc az_gateway top level supervisor.
 %% @end
 %%%-------------------------------------------------------------------
 
--module(amaze_core_sup).
+-module(amaze_gateway_sup).
 
 -behaviour(supervisor).
 
@@ -29,21 +29,14 @@ start_link() ->
 -spec init([])
         -> {ok, {{supervisor:strategy(), non_neg_integer(), pos_integer()}, [supervisor:child_spec()]}}.
 init([]) ->
+    amaze_gateway_transport:init(),
+
     SupFlags = #{
         strategy => one_for_all,
         intensity => 0,
         period => 1
     },
-
-    EtsServer = #{
-        id=> amaze_ets_server,
-        start=> {amaze_ets_server,start_link,[]},
-        restart => permanent,
-        shutdown => brutal_kill,
-        type=> worker
-    },
-
-    ChildSpecs = [EtsServer],
+    ChildSpecs = [],
     {ok, {SupFlags, ChildSpecs}}.
 
 %% internal functions
