@@ -11,13 +11,16 @@
 -behavior(amaze_client_transport).
 %% API
 -export([init/1]).
-init(#{url=Url, pack_frame=PackFrame})->
+init(#{url=Url})->
     UrlInfo = amaze_uri:parse(Url),
     Port = maps:get(port,UrlInfo),
     Scheme = maps:get(scheme,UrlInfo),
     Host = maps:get(host,UrlInfo),
-
-    {ok, ConnPid} = case Scheme of
-                         http->gun:open(Host, Port);
-                        https-> gun:open(Host,Port,#{transport => tls})
-                    end.
+    case Scheme of
+        http->
+            {ok,ConnPid} = gun:open(Host, Port),
+            {ok,ConnPid,UrlInfo};
+        https->
+            {ok,ConnPid} = gun:open(Host,Port,#{transport => tls}),
+            {ok,ConnPid,UrlInfo}
+    end.

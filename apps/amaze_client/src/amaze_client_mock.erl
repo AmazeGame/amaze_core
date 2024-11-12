@@ -20,7 +20,7 @@
 
 -define(SERVER, ?MODULE).
 
--record(amaze_client_mock_state, {con_context}).
+-record(amaze_client_mock_state, {conn_pid::pid(),transport_handle::atom(),context::map()}).
 
 %%%===================================================================
 %%% API
@@ -42,9 +42,9 @@ start_link(Arg) ->
     {ok, State :: #amaze_client_mock_state{}} | {ok, State :: #amaze_client_mock_state{}, timeout() | hibernate} |
     {stop, Reason :: term()} | ignore).
 init(Args) ->
-    #{transport_handle:=TransportHandle}= Args,
-    Context = TransportHandle:init(Args),
-    {ok, #amaze_client_mock_state{con_context = Context}}.
+    #{transport_handle:=TransportHandle,pack_frame:=PackFrame}= Args,
+    {ok,ConnPid,UrlInfo} = TransportHandle:init(Args),
+    {ok, #amaze_client_mock_state{conn_pid = ConnPid,transport_handle = TransportHandle,context = UrlInfo#{pack_frame=>PackFrame}}}.
 
 %% @private
 %% @doc Handling call messages
@@ -74,6 +74,16 @@ handle_cast(_Request, State = #amaze_client_mock_state{}) ->
     {noreply, NewState :: #amaze_client_mock_state{}} |
     {noreply, NewState :: #amaze_client_mock_state{}, timeout() | hibernate} |
     {stop, Reason :: term(), NewState :: #amaze_client_mock_state{}}).
+handle_info({gun_up,ConnPid,http}, State = #amaze_client_mock_state{}) ->
+    {noreply, State};
+handle_info({gun_up,ConnPid,https}, State = #amaze_client_mock_state{}) ->
+    {noreply, State};
+handle_info({gun_up,ConnPid,ws}, State = #amaze_client_mock_state{}) ->
+    {noreply, State};
+handle_info({gun_up,ConnPid,wss}, State = #amaze_client_mock_state{}) ->
+    {noreply, State};
+handle_info({'DOWN', MRef, process, ServerPid, Reason}, State = #amaze_client_mock_state{}) ->
+    {noreply, State};
 handle_info(_Info, State = #amaze_client_mock_state{}) ->
     {noreply, State}.
 
@@ -84,7 +94,8 @@ handle_info(_Info, State = #amaze_client_mock_state{}) ->
 %% with Reason. The return value is ignored.
 -spec(terminate(Reason :: (normal | shutdown | {shutdown, term()} | term()),
     State :: #amaze_client_mock_state{}) -> term()).
-terminate(_Reason, _State = #amaze_client_mock_state{}) ->
+terminate(_Reason, _State = #amaze_client_mock_state{conn_pid = ConnPid}) ->
+    gun:close(ConnPid),
     ok.
 
 %% @private
