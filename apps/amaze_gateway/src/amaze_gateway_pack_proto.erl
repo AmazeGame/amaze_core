@@ -4,10 +4,11 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 11. 11月 2024 20:32
+%%% Created : 12. 11月 2024 11:55
 %%%-------------------------------------------------------------------
--module(client_multi_transport).
+-module(amaze_gateway_pack_proto).
 -author("adrianx@163.com").
-
 %% API
--export([]).
+-callback name()->atom().
+-callback content_type()-> string().
+-callback router(MsgName::string()|binary()|integer()|atom())->{module(),atom()}.

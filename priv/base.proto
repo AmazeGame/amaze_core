@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+message base_message{
+    int32 msg_id = 1;
+}

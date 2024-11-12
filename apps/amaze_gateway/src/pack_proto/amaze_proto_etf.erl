@@ -4,10 +4,18 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 11. 11月 2024 20:32
+%%% Created : 12. 11月 2024 12:01
 %%%-------------------------------------------------------------------
--module(client_multi_transport).
+-module(amaze_proto_etf).
 -author("adrianx@163.com").
-
+-behaviour(amaze_gateway_pack_proto).
 %% API
 -export([]).
+name()->
+    etf.
+
+content_type()->
+    "application/x-erlang-term".
+
+router(MsgName)->
+    {amaze_gateway_pack_serializer,MsgName}.

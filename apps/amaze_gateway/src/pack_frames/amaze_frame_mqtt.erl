@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
 %%% @author adrianx@163.com
-%%% @copyright (C) 2024, <COMPANY>
+%%% @copyright (C) 2024, adrianx@163.com
 %%% @doc
 %%%
 %%% @end

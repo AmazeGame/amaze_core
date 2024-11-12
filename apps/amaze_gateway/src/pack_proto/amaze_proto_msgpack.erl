@@ -1,14 +1,13 @@
 %%%-------------------------------------------------------------------
-%%% @author 刘金鑫
-%%% @copyright (C) 2024, QingTian
+%%% @author adrianx@163.com
+%%% @copyright (C) 2024, adrianx@163.com
 %%% @doc
 %%%
 %%% @end
-%%% Created : 11. 11月 2024 20:33
+%%% Created : 12. 11月 2024 12:01
 %%%-------------------------------------------------------------------
--module(amame_client_transport).
--author("刘金鑫").
+-module(amaze_proto_msgpack).
+-author("adrianx@163.com").
 
 %% API
 -export([]).
--callback init(Arg::term())->ok.

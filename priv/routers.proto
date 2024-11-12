@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message base_message{
+    int32 msg_id = 1;
+}
+
+enum router_type{
+    rt_unknown = 0;
+    rt_gate    = 1;
+    rt_role    = 2;
+    rt_map     = 3;
+    rt_web     = 4;
+}
+

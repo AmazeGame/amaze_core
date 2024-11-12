@@ -1,16 +1,16 @@
 %%%-------------------------------------------------------------------
-%%% @author 刘金鑫
-%%% @copyright (C) 2024, QingTian
+%%% @author adrianx@163.com
+%%% @copyright (C) 2024, adrianx@163.com
 %%% @doc
 %%%
 %%% @end
 %%% Created : 11. 11月 2024 21:11
 %%%-------------------------------------------------------------------
 -module(amaze_client_mock).
--author("刘金鑫").
+-author("adrianx@163.com").
 
 -behaviour(gen_server).
-
+-include("amaze_client.hrl").
 %% API
 -export([start_link/1]).
 
@@ -20,7 +20,7 @@
 
 -define(SERVER, ?MODULE).
 
--record(amaze_client_mock_state, {conn_pid::pid(),transport_handle::atom(),context::map()}).
+-record(amaze_client_mock_state, {transport_handle::atom(),context::map()}).
 
 %%%===================================================================
 %%% API
@@ -42,9 +42,9 @@ start_link(Arg) ->
     {ok, State :: #amaze_client_mock_state{}} | {ok, State :: #amaze_client_mock_state{}, timeout() | hibernate} |
     {stop, Reason :: term()} | ignore).
 init(Args) ->
-    #{transport_handle:=TransportHandle,pack_frame:=PackFrame}= Args,
-    {ok,ConnPid,UrlInfo} = TransportHandle:init(Args),
-    {ok, #amaze_client_mock_state{conn_pid = ConnPid,transport_handle = TransportHandle,context = UrlInfo#{pack_frame=>PackFrame}}}.
+    #{transport_handle:=TransportHandle}= Args,
+    {ok,MockContext} = TransportHandle:init(Args),
+    {ok, #amaze_client_mock_state{transport_handle = TransportHandle,context = MockContext}}.
 
 %% @private
 %% @doc Handling call messages
@@ -74,14 +74,21 @@ handle_cast(_Request, State = #amaze_client_mock_state{}) ->
     {noreply, NewState :: #amaze_client_mock_state{}} |
     {noreply, NewState :: #amaze_client_mock_state{}, timeout() | hibernate} |
     {stop, Reason :: term(), NewState :: #amaze_client_mock_state{}}).
-handle_info({gun_up,ConnPid,http}, State = #amaze_client_mock_state{}) ->
-    {noreply, State};
-handle_info({gun_up,ConnPid,https}, State = #amaze_client_mock_state{}) ->
-    {noreply, State};
-handle_info({gun_up,ConnPid,ws}, State = #amaze_client_mock_state{}) ->
-    {noreply, State};
-handle_info({gun_up,ConnPid,wss}, State = #amaze_client_mock_state{}) ->
-    {noreply, State};
+handle_info({gun_up,_ConnPid,http}, State = #amaze_client_mock_state{transport_handle=TransportHandle,context = Context0}) ->
+    {ok,Context1} = TransportHandle:post_open(Context0),
+    {ok,Context} = TransportHandle:next_frame(Context1),
+    {noreply, State#amaze_client_mock_state{context = Context}};
+handle_info({gun_up,_ConnPid,https}, State = #amaze_client_mock_state{transport_handle=TransportHandle,context = Context0}) ->
+    {ok,Context1} = TransportHandle:post_open(Context0),
+    {ok,Context} = TransportHandle:next_frame(Context1),
+    {noreply, State#amaze_client_mock_state{context = Context}};
+handle_info({gun_up,_ConnPid,ws}, State = #amaze_client_mock_state{transport_handle=TransportHandle,context = Context0}) ->
+    {ok,Context} = TransportHandle:post_open(Context0),
+    {noreply, State#amaze_client_mock_state{context = Context}};
+handle_info({gun_up,_ConnPid,wss}, State = #amaze_client_mock_state{transport_handle=TransportHandle,context = Context0}) ->
+    {ok,Context} = TransportHandle:post_open(Context0),
+    {noreply, State#amaze_client_mock_state{context = Context}};
+
 handle_info({'DOWN', MRef, process, ServerPid, Reason}, State = #amaze_client_mock_state{}) ->
     {noreply, State};
 handle_info(_Info, State = #amaze_client_mock_state{}) ->
@@ -94,8 +101,8 @@ handle_info(_Info, State = #amaze_client_mock_state{}) ->
 %% with Reason. The return value is ignored.
 -spec(terminate(Reason :: (normal | shutdown | {shutdown, term()} | term()),
     State :: #amaze_client_mock_state{}) -> term()).
-terminate(_Reason, _State = #amaze_client_mock_state{conn_pid = ConnPid}) ->
-    gun:close(ConnPid),
+terminate(_Reason, _State = #amaze_client_mock_state{transport_handle = TransportHandle,context = Context}) ->
+    TransportHandle:terminate(Context),
     ok.
 
 %% @private

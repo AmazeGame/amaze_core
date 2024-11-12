@@ -4,9 +4,9 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 11. 11月 2024 20:32
+%%% Created : 12. 11月 2024 12:01
 %%%-------------------------------------------------------------------
--module(client_multi_transport).
+-module(amaze_proto_json).
 -author("adrianx@163.com").
 
 %% API

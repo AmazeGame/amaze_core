@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+enum auth_platform{
+    none        = 0;
+    myself      = 1;
+    weixin      = 2;
+    qq          = 3;
+    weibo       = 4;
+    huawei      = 5;
+    qihoo360    = 6;
+    vivo        = 7;
+    oppo        = 8;
+    taobao      = 9;
+    alipay      = 10;
+    tiktok      = 11;
+    facebook    = 12;
+    twitter     = 13;
+    google      = 14;
+    kuaishou    = 15;
+    douyin      = 16;
+}
+
+//msg_id:1001   @router:rt_gate
+message login_2s{
+    int32 msg_id            = 1;
+    string uid              = 2;
+    auth_platform platform  = 3;
+    string token            = 4;
+}
+
+message login_2c{
+    int32 msg_id            = 1;
+    int32 code              = 2;
+    bytes auth_info         = 3;
+}
+
+//msg_id:1002   @router:rt_role
+message enter_map_2s{
+    int32 msg_id            = 1;
+}
